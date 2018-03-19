@@ -63,7 +63,7 @@ public class World {
 
         addShelter("PreyBase");
         int i;
-        for(i = 0; i < 45; ++i) {
+        for(i = 0; i < 40; ++i) {
             addRandomAnimal("Prey");
         }
         for(i = 0; i < 6; ++i) {
