@@ -195,8 +195,6 @@ public class World {
     public void update() {
         updateClock();
         ageAnimals();
-        System.out.println("number of animals = [" + animalList.size() + "]");
-
         int i;
         for(i = 0; i < animalList.size(); ++i) {
             this.animalList.get(i).update();
