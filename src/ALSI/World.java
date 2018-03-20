@@ -89,7 +89,7 @@ public class World {
             do {
                 x = rand.nextInt(Main.SIZE_X);
                 y = rand.nextInt(Main.SIZE_Y);
-                a = new Predator(x, y, this.trackAnimalID, this.getDay(), this.getYear(), this);
+                a = new Predator(x, y, trackAnimalID, getDay(), getYear(), this);
             } while(this.overlaps(a.getMarker()));
 
             a.addSelfToLists();
@@ -101,9 +101,9 @@ public class World {
     public void addAnimal(String type, int x, int y, char gender, String name, double speed, int strength, int smell, int sight, int size, int maxInv) {
         Animal a = null;
         if (type.equals("Prey")) {
-            a = new Prey(x, y, this.trackAnimalID, this.getDay(), this.getYear(), this);
+            a = new Prey(x, y, trackAnimalID, getDay(), getYear(), this);
         } else if (type.equals("Predator")) {
-            a = new Predator(x, y, gender, name, speed, strength, smell, sight, size, maxInv, this.trackAnimalID, this.getDay(), this.getYear(), this);
+            a = new Predator(x, y, gender, name, speed, strength, smell, sight, size, maxInv,trackAnimalID, getDay(), getYear(), this);
         }
 
         ++this.trackAnimalID;
@@ -147,14 +147,14 @@ public class World {
             int x = Main.SIZE_X / 2;
             int y = Main.SIZE_Y / 2;
             if (type.equals("PreyBase")) {
-                s = new Shelter(type, x, y, this.shelterID, Color.rgb(220, 200, 160));
+                s = new Shelter(type, x, y, shelterID, Color.rgb(220, 200, 160));
             } else {
                 if (!type.equals("PredatorBase")) {
                     System.out.println("Error creating shelter");
                     return;
                 }
 
-                s = new Shelter(type, 10, 10, this.shelterID, Color.rgb(100, 110, 120));
+                s = new Shelter(type, 10, 10, shelterID, Color.rgb(100, 110, 120));
             }
         } while(this.overlaps(s.getMarker()));
 
@@ -164,33 +164,27 @@ public class World {
     }
 
     public boolean overlaps(Circle c1) {
-        Iterator var2 = this.foodList.iterator();
-
-        Food food;
-        do {
-            if (!var2.hasNext()) {
-                var2 = this.animalList.iterator();
-
-                Animal animal;
-                do {
-                    if (!var2.hasNext()) {
-                        return false;
-                    }
-
-                    animal = (Animal)var2.next();
-                } while(!Collision.overlapsEfficient(c1, animal.getMarker()) || !Collision.overlapsAccurate(c1, animal.getMarker()));
-
-                return true;
+        for(Animal animal : animalList){
+            if (Collision.overlapsEfficient(c1, animal.getMarker())){
+                if (Collision.overlapsAccurate(c1, animal.getMarker())) {
+                    // Return  true if a collision was recorded
+                    return true;
+                }
             }
-
-            food = (Food)var2.next();
-        } while(!Collision.overlapsEfficient(c1, food.getMarker()) || !Collision.overlapsAccurate(c1, food.getMarker()));
-
-        return true;
+        }
+        for(Food food : foodList){
+            if (Collision.overlapsEfficient(c1, food.getMarker())){
+                if (Collision.overlapsAccurate(c1, food.getMarker())) {
+                    // Return  true if a collision was recorded
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void killAnimal(int i) {
-        this.addFood(this.getAnimalList().get(i).getSpecies(), (int)(this.animalList.get(i).getMarker().getCenterX() + ((Animal)this.animalList.get(i)).getMarker().getTranslateX()), (int)(((Animal)this.animalList.get(i)).getMarker().getCenterY() + ((Animal)this.animalList.get(i)).getMarker().getTranslateY()), (int)((Animal)this.animalList.get(i)).getMarker().getRadius());
+        this.addFood(this.getAnimalList().get(i).getSpecies(), (int)(animalList.get(i).getMarker().getCenterX() + (animalList.get(i)).getMarker().getTranslateX()), (int)((animalList.get(i)).getMarker().getCenterY() + (animalList.get(i)).getMarker().getTranslateY()), (int)(animalList.get(i)).getMarker().getRadius());
         this.getAnimalGroup().getChildren().remove(i);
         this.getAnimalSmellGroup().getChildren().remove(i);
         this.getAnimalSightGroup().getChildren().remove(i);
@@ -199,17 +193,17 @@ public class World {
     }
 
     public void update() {
-        this.updateClock();
-        this.ageAnimals();
-        System.out.println("number of animals = [" + this.animalList.size() + "]");
+        updateClock();
+        ageAnimals();
+        System.out.println("number of animals = [" + animalList.size() + "]");
 
         int i;
-        for(i = 0; i < this.animalList.size(); ++i) {
+        for(i = 0; i < animalList.size(); ++i) {
             this.animalList.get(i).update();
 
-            for(int j = 0; j < this.animalList.size(); ++j) {
-                if (this.animalList.get(j).getHealth() <= 0) {
-                    this.killAnimal(j);
+            for(int j = 0; j < animalList.size(); ++j) {
+                if (animalList.get(j).getHealth() <= 0) {
+                    killAnimal(j);
                     --j;
                     --i;
                 }
@@ -217,7 +211,7 @@ public class World {
         }
 
         for(i = 0; i < this.shelterList.size(); ++i) {
-           this.shelterList.get(i).update();
+          shelterList.get(i).update();
         }
 
     }

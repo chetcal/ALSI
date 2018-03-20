@@ -293,12 +293,12 @@ public class Animal {
             --ageYear;
         }
 
-        this.setAgeYear(ageYear);
-        this.setAgeDay(ageDay);
+        setAgeYear(ageYear);
+        setAgeDay(ageDay);
     }
 
     public int getAgeRecord() {
-        return this.ageRecord;
+        return ageRecord;
     }
 
     public void setAgeRecord(int ageRec) {
@@ -306,17 +306,17 @@ public class Animal {
     }
 
     public void ageAnimal() {
-        if (this.getAgeRecord() < this.getAgeYear()) {
-            this.setAgeRecord(this.getAgeYear());
-            if (this.getAgeYear() >= this.getBreedAge()) {
-                this.setBreed(true);
+        if (getAgeRecord() < getAgeYear()) {
+            setAgeRecord(getAgeYear());
+            if (getAgeYear() >= getBreedAge()) {
+                setBreed(true);
             }
         }
 
     }
 
     public Rectangle getTargLocation() {
-        return this.targLocate;
+        return targLocate;
     }
 
     public void setTargLocation(Rectangle targ) {
@@ -324,7 +324,7 @@ public class Animal {
     }
 
     public Rectangle getHomeLocation() {
-        return this.homeLocate;
+        return homeLocate;
     }
 
     public void setHomeLocation(Rectangle home) {
@@ -332,12 +332,12 @@ public class Animal {
     }
 
     public void setBase(Target home, int ID) {
-        this.setHomeTarg(home);
-        this.setHomeID(ID);
+        setHomeTarg(home);
+        setHomeID(ID);
     }
 
     public int getHomeRest() {
-        return this.HomeWait;
+        return HomeWait;
     }
 
     public void setHomeRest(int wait) {
@@ -345,7 +345,7 @@ public class Animal {
     }
 
     public World getWorldRef() {
-        return this.worldref;
+        return worldref;
     }
 
     public void setWorldRef(World world) {
@@ -353,7 +353,7 @@ public class Animal {
     }
 
     public int getX() {
-        return this.x;
+        return x;
     }
 
     public void setX(int xIn) {
@@ -361,7 +361,7 @@ public class Animal {
     }
 
     public int getY() {
-        return this.y;
+        return y;
     }
 
     public void setY(int yIn) {
@@ -369,7 +369,7 @@ public class Animal {
     }
 
     public int getMaxInventory() {
-        return this.MaxInventory;
+        return MaxInventory;
     }
 
     public void setMaxInv(int MaxInv) {
@@ -377,7 +377,7 @@ public class Animal {
     }
 
     public double getSpeed() {
-        return this.speed;
+        return speed;
     }
 
     public void setSpeed(double speed) {
@@ -385,7 +385,7 @@ public class Animal {
     }
 
     public char getSex() {
-        return this.sex;
+        return sex;
     }
 
     public void setSex(char sex) {
@@ -393,12 +393,12 @@ public class Animal {
     }
 
     public void removeLocalTarget() {
-        this.setLocalTargetBool(false);
-        this.setTargetingAnimal(false);
-        this.setTargetingFood(false);
-        this.targetID = -1;
-        this.setDx(0.0D);
-        this.setDy(0.0D);
+        setLocalTargetBool(false);
+        setTargetingAnimal(false);
+        setTargetingFood(false);
+        targetID = -1;
+        setDx(0);
+        setDy(0);
     }
 
     public boolean getAtBase() {
@@ -654,18 +654,13 @@ public class Animal {
     }
 
     public boolean foodThere() {
-        Iterator var1 = this.getWorldRef().getFoodList().iterator();
-
-        Food food;
-        do {
-            if (!var1.hasNext()) {
-                return false;
+        for(Food food : getWorldRef().getFoodList()){
+            if (food.getID() == targetID){
+                // Return true if the target food id was found
+                return true;
             }
-
-            food = (Food)var1.next();
-        } while(food.getID() != this.targetID);
-
-        return true;
+        }
+        return false;
     }
 
     public void storeFood() {
@@ -681,18 +676,15 @@ public class Animal {
     }
 
     public boolean animalThere() {
-        Iterator var1 = this.getWorldRef().getAnimalList().iterator();
-
-        Animal animal;
-        do {
-            if (!var1.hasNext()) {
-                return false;
+        for(Animal animal : getWorldRef().getAnimalList()){
+            if (animal.getID() == targetID){
+                if (Collision.overlapsEfficient(animal.getMarker(), getSmellCircle())) {
+                    // return true if the animal was found within the list
+                    return true;
+                }
             }
-
-            animal = (Animal)var1.next();
-        } while(animal.getID() != this.targetID || !Collision.overlapsEfficient(animal.getMarker(), this.getSmellCircle()));
-
-        return true;
+        }
+        return false;
     }
 
     public void targetHome() {
@@ -799,21 +791,21 @@ public class Animal {
     }
 
     public void fight() {
-        if (this.getHealth() > 0) {
-            Iterator var1 = this.getWorldRef().getAnimalList().iterator();
-
-            while(var1.hasNext()) {
-                Animal animal = (Animal)var1.next();
-                if (animal.getID() == this.getTargetID() && this.getStrength() >= animal.getStrength()) {
-                    animal.setHealth(-1);
+        if (getHealth() > 0) {
+            // loop for all Animals
+            for (Animal animal : getWorldRef().getAnimalList()) {
+                if (animal.getID() == getTargetID()){
+                    if (animal.getStrength() <= getStrength()) {
+                        animal.setHealth(-10);
+                        return;
+                    }
                 }
             }
         }
-
     }
 
     public boolean isInHuntList(char mark) {
-        byte X;
+       int X;
         if (mark == 'A') {
             X = 0;
         } else {
@@ -824,7 +816,7 @@ public class Animal {
             X = 1;
         }
 
-        byte Y;
+        int Y;
         if (this.getMark() == 'A') {
             Y = 0;
         } else {
@@ -835,63 +827,61 @@ public class Animal {
             Y = 1;
         }
 
-        return (Boolean)((ArrayList)this.getWorldRef().getHuntList().get(X)).get(Y);
+        return getWorldRef().getHuntList().get(X).get(Y);
     }
 
     public boolean isInEatList(char mark) {
-        byte X;
+        int X;
         if (mark == 'A') {
             X = 0;
-        } else {
-            if (mark != 'B') {
-                return false;
-            }
-
+        } else if (mark == 'B') {
             X = 1;
-        }
+        }else{return false;}
 
-        byte Y;
-        if (this.getMark() == 'A') {
+
+        int Y;
+        if (getMark() == 'A') {
             Y = 0;
-        } else {
-            if (this.getMark() != 'B') {
-                return false;
-            }
-
+        } else if (getMark() == 'B') {
             Y = 1;
-        }
+        }else{ return false;}
 
-        return (Boolean)((ArrayList)this.getWorldRef().getHuntList().get(X)).get(Y);
+
+
+        return getWorldRef().getEatList().get(X).get(Y);
     }
 
-    public void checkFood() {
-        Iterator var1 = this.getWorldRef().getAnimalList().iterator();
-
-        while(var1.hasNext()) {
-            Animal animal = (Animal)var1.next();
-            if (this.isInHuntList(animal.getMark()) && this.getID() != animal.getID() && Collision.overlapsEfficient(this.getSmellCircle(), animal.getMarker()) && Collision.overlapsAccurate(this.getSmellCircle(), animal.getMarker())) {
-                this.setTargetingAnimal(true);
-                this.setTargetID(animal.getID());
-                this.setLocalHuntTarget(animal.getMarker());
-                break;
+    public void checkFood(){
+        for(Animal animal : getWorldRef().getAnimalList()) {
+            if (isInHuntList(animal.getMark())) {
+                if (getID() != animal.getID()) {
+                    if (Collision.overlapsEfficient(this.getSmellCircle(), animal.getMarker())) {
+                        if (Collision.overlapsAccurate(this.getSmellCircle(), animal.getMarker())) {
+                            setTargetingAnimal(true);
+                            setTargetID(animal.getID());
+                            setLocalHuntTarget(animal.getMarker());
+                            break;
+                        }
+                    }
+                }
             }
         }
-
-        var1 = this.getWorldRef().getFoodList().iterator();
-
-        Food food;
-        do {
-            if (!var1.hasNext()) {
-                return;
+        // Check for food within the surrounding area
+        for(Food food : getWorldRef().getFoodList()){
+            boolean test = isInEatList(food.getMark());
+            if (test) {
+                if (Collision.overlapsEfficient(this.getSmellCircle(), food.getMarker())) {
+                    if (Collision.overlapsAccurate(this.getSmellCircle(), food.getMarker())) {
+                        // save the information
+                        setTargetingFood(true);
+                        setTargetingAnimal(false);
+                        setTargetID(food.getID());
+                        setLocalHuntTarget(food.getMarker());
+                        return;
+                    }
+                }
             }
-
-            food = (Food)var1.next();
-        } while(!this.isInEatList(food.getMark()) || !Collision.overlapsEfficient(this.getSmellCircle(), food.getMarker()) || !Collision.overlapsAccurate(this.getSmellCircle(), food.getMarker()));
-
-        this.setTargetingFood(true);
-        this.setTargetingAnimal(false);
-        this.setTargetID(food.getID());
-        this.setLocalHuntTarget(food.getMarker());
+        }
     }
 
     public void createLocaltoMain() {
@@ -944,60 +934,65 @@ public class Animal {
     }
 
     public void enterBase() {
-        this.setHomeTimer(400);
-        this.setHomeRest(400);
-        this.setAtBase(true);
-        this.setVisibility(false);
-        this.setTargetHomeBool(false);
-        this.getWorldRef().getShelterList().get(0).sheltered.add(this);
-        int x = this.getWorldRef().getShelterList().size();
+        Random rand = new Random();
+        setHomeRest(400);
+        setAtBase(true);
+        // make self invisible while within the shelter
+        setVisibility(false);
+        setTargetHomeBool(false);
 
-        for(int i = 0; i < x; ++i) {
-            if (this.getBreed()) {
-                this.setHomeTimer(1000);
-                Iterator var3 = this.getWorldRef().getAnimalList().iterator();
 
-                while(var3.hasNext()) {
-                    Animal animal = (Animal)var3.next();
-                    if (animal.getAtBase() && animal.getSex() != this.getSex() && animal.getID() != this.getID()) {
-                        animal.setBreed(false);
-                        this.setBreed(false);
-                        this.createBaby(animal);
-                        this.setBreedTimer(1000);
-                        animal.setBreedTimer(1000);
-                        break;
+        // loop through all shelter
+        for (int i = 0; i < getWorldRef().getShelterList().size(); i++) {
+            if (getWorldRef().getShelterList().get(i).getID() == getHomeID()) {
+                // Check if the opposite sex is in the shelter and is also the correct age
+                if (getBreed()) {
+                    setHomeRest(600);
+                    for (Animal animal : getWorldRef().getAnimalList()) {
+                        if (animal.getAtBase()) {
+                            if (animal.getSex() != getSex()) {
+                                if (animal.getBreed()) {
+                                    if (animal.getHomeID() == getHomeID()) {
+                                        animal.setBreed(false);
+                                        setBreed(false);
+                                        createBaby(animal);
+                                        setBreedTimer(5000);
+                                        animal.setBreedTimer(5000);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
+                    setBreedTimer(5000);
                 }
-
-                this.setBreedTimer(6000);
             }
         }
-
     }
 
     public void addSelfToLists() {
-        this.getWorldRef().getAnimalList().add(this);
-        this.getWorldRef().getAnimalGroup().getChildren().add(this.getMarker());
-        this.getWorldRef().getAnimalSmellGroup().getChildren().add(this.getSmellCircle());
-        this.getWorldRef().getAnimalSightGroup().getChildren().add(this.getSightCircle());
-        this.getWorldRef().getAnimalTargetGroup().getChildren().add(this.getTargLocation());
-        this.getWorldRef().getAnimalHomeLocationGroup().getChildren().add(this.getHomeLocation());
+        getWorldRef().getAnimalList().add(this);
+        getWorldRef().getAnimalGroup().getChildren().add(getMarker());
+        getWorldRef().getAnimalSmellGroup().getChildren().add(getSmellCircle());
+        getWorldRef().getAnimalSightGroup().getChildren().add(getSightCircle());
+        getWorldRef().getAnimalTargetGroup().getChildren().add(getTargLocation());
+        getWorldRef().getAnimalHomeLocationGroup().getChildren().add(getHomeLocation());
     }
 
     public void update() {
-        if (this.getAtBase()) {
-            this.setHomeRest(this.getHomeRest() - 1);
-            if (this.getHomeRest() <= 0) {
-                this.exitBase();
+        if (getAtBase()) {
+            setHomeRest(getHomeRest() - 1);
+            if (getHomeRest() <= 0) {
+                exitBase();
             }
         } else {
-            this.checkHunger();
-            this.target();
-            this.direct();
-            this.move();
+            checkHunger();
+            target();
+            direct();
+            move();
         }
 
-        this.ageAnimal();
+        ageAnimal();
     }
 
     public void checkBase() {
